@@ -14,13 +14,22 @@ class SuperHeroRepository extends IRepository {
   }
 
   async buscarPorAtributo(atributo, valor) {
-    const query = { [atributo]: new RegExp(valor, "i") };
+    // Verificar si el atributo es "edad" o cualquier campo numérico
+    const esNumerico = ["edad"].includes(atributo); // Lista de atributos numéricos
+    const query = esNumerico
+      ? { [atributo]: valor } // Búsqueda exacta para números
+      : { [atributo]: new RegExp(valor, "i") }; // Búsqueda insensible a mayúsculas/minúsculas para strings
+  
     return await SuperHero.find(query);
-  }
+  }  
 
   async obtenerMayoresDe30() {
-    return await SuperHero.find({ edad: { $gt: 30 } });
-  }
+    return await SuperHero.find({
+      edad: { $gt: 30 }, // Edad mayor a 30
+      planetaOrigen: "Tierra", // Planeta de origen
+      "poderes.1": { $exists: true }, // Al menos 2 elementos en el array poderes
+    });
+  }  
 
   async crear(superheroe) {
     const nuevoSuperHeroe = new SuperHero(superheroe);

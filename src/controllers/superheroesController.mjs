@@ -18,15 +18,17 @@ import mongoose from "mongoose";
 export async function obtenerSuperheroePorIdController(req, res) {
   try {
     const { id } = req.params;
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).send({ mensaje: "ID inválido" });
     }
+
     const superheroe = await obtenerSuperheroePorId(id);
-    if (superheroe) {
-      res.send(renderizarSuperheroe(superheroe));
-    } else {
-      res.status(404).send({ mensaje: "Superhéroe no encontrado" });
+    if (!superheroe) {
+      return res.status(404).send({ mensaje: "Superhéroe no encontrado" });
     }
+
+    res.send(superheroe);
   } catch (error) {
     res.status(500).send({ mensaje: "Error interno del servidor", error });
   }
@@ -60,7 +62,13 @@ export async function buscarSuperheroePorAtributoController(req, res) {
 export async function obtenerSuperheroesMayoresDe30Controller(req, res) {
   try {
     const superheroes = await obtenerSuperheroesMayoresDe30();
-    res.send(renderizarListaSuperheroes(superheroes));
+    if (superheroes.length === 0) {
+      return res
+        .status(404)
+        .json({ mensaje: "No se encontraron superhéroes mayores de 30 años" });
+    }
+
+    res.send(superheroes);
   } catch (error) {
     res.status(500).send({ mensaje: "Error interno del servidor", error });
   }
