@@ -21,10 +21,19 @@ class SuperHeroRepository extends IRepository {
   async obtenerMayoresDe30() {
     return await SuperHero.find({ edad: { $gt: 30 } });
   }
+
+  async crear(superheroe) {
+    const nuevoSuperHeroe = new SuperHero(superheroe);
+    return await nuevoSuperHeroe.save();
+  }
+
+  async actualizar(id, datos) {
+    return await SuperHero.findByIdAndUpdate(id, datos, { new: true }).exec();
+  }
+
+  async eliminar(id) {
+    return await SuperHero.findByIdAndDelete(id).exec();
+  }
 }
 
 export default new SuperHeroRepository();
-
-// Criterios de busqueda
-//  planetaOrigen: "Tierra",
-// poderes: { $size: { $gte: 2 } },
